@@ -95,6 +95,24 @@ app.patch('/api/v1/tours/:id', (req, res) => {
     });
 });
 
+// Route to delete a specific tour data using tourId and DELETE request
+
+app.delete('/api/v1/tours/:id', (req, res) => {
+    const tourId = +req.params.id;
+    const tour = tours.filter(tourElem => tourElem.id === tourId);
+
+    if(!tour) {
+        res.status(404).json({
+            status : 'failed',
+            message : 'Invalid Id'
+        });
+    }
+
+    res.status(204).json({
+        status : 'success',
+        data : null
+    });
+});
 
 // Listening on specific port
 
