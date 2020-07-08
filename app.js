@@ -6,7 +6,14 @@ const fs = require('fs');
 // Creating / Initializing an express app
 
 const app = express();
+
+// Defining Middleware
+
 app.use(express.json());
+app.use((req, res, next) => {
+    console.log("Hello from the Middleware 😁");
+    next();
+});
 
 // Reading file synchronously at once
 
