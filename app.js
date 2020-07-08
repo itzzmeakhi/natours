@@ -19,6 +19,8 @@ app.use(express.json());
 
 const tours = JSON.parse(fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`, 'utf-8'));
 
+// Route to GET all available tours
+
 app.get('/api/v1/tours', (req, res) => {
     res.status(200).json({
         status : 'success',
@@ -28,6 +30,33 @@ app.get('/api/v1/tours', (req, res) => {
         }
     });
 });
+
+// Route to GET a specific tour using tourId
+
+app.get('/api/v1/tours/:id', (req, res) => {
+    // console.log(req.params);
+
+    const tourId = +req.params.id;
+    const tour = tours.filter(tourElem => tourElem.id === tourId);
+    // console.log(tour);
+
+    if(!tour) {
+        res.status(404).send({
+            status : 'failed',
+            message : 'Invalid Id'
+        });
+    }
+
+    res.status(200).json({
+        status : 'success',
+        results : tour.length,
+        data : {
+            tour : tour
+        }
+    });
+});
+
+// Route to POST a tour to the available tours
 
 app.post('api/v1/tours', (req, res) => {
     const newId = tours[tours.length - 1].id + 1;
