@@ -8,20 +8,13 @@ const fs = require('fs');
 const app = express();
 app.use(express.json());
 
-// Defining Routes
-
-// app.get('/', (req, res) => {
-//     //res.status(200).send("Hi from the server!");
-//     res.json({'message' : 'Hi from the server'});
-// })
-
 // Reading file synchronously at once
 
 const tours = JSON.parse(fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`, 'utf-8'));
 
-// Route to GET all available tours
+// GET all available tours
 
-app.get('/api/v1/tours', (req, res) => {
+const getAllTours = (req, res) => {
     res.status(200).json({
         status : 'success',
         results : tours.length,
@@ -29,16 +22,14 @@ app.get('/api/v1/tours', (req, res) => {
             tours
         }
     });
-});
+};
 
-// Route to GET a specific tour using tourId
+// GET a specific tours based on tourId
 
-app.get('/api/v1/tours/:id', (req, res) => {
-    // console.log(req.params);
+const getTour = (req, res) => {
 
     const tourId = +req.params.id;
     const tour = tours.filter(tourElem => tourElem.id === tourId);
-    // console.log(tour);
 
     if(!tour) {
         res.status(404).json({
@@ -54,11 +45,11 @@ app.get('/api/v1/tours/:id', (req, res) => {
             tour : tour
         }
     });
-});
+};
 
-// Route to POST a tour to the available tours
+// POST a new tour data object to the available tours list
 
-app.post('/api/v1/tours', (req, res) => {
+const postTour = (req, res) => {
     const newId = tours[tours.length - 1].id + 1;
     const newTour = Object.assign({ id : newId }, req.body);
 
@@ -72,11 +63,11 @@ app.post('/api/v1/tours', (req, res) => {
             }
         });
     });
-});
+};
 
-// Route to update a specific tour data using tourId and PATCH request
+// PATCH a specific tour object using tourId
 
-app.patch('/api/v1/tours/:id', (req, res) => {
+const patchTour = (req, res) => {
     const tourId = +req.params.id;
     const tour = tours.filter(tourElem => tourElem.id === tourId);
 
@@ -93,11 +84,11 @@ app.patch('/api/v1/tours/:id', (req, res) => {
             tour : '<Tour Data of Id: .... is updated! />'
         }
     });
-});
+};
 
-// Route to delete a specific tour data using tourId and DELETE request
+// DELETE a specific tour object using tourId
 
-app.delete('/api/v1/tours/:id', (req, res) => {
+const deleteTour = (req, res) => {
     const tourId = +req.params.id;
     const tour = tours.filter(tourElem => tourElem.id === tourId);
 
@@ -112,7 +103,21 @@ app.delete('/api/v1/tours/:id', (req, res) => {
         status : 'success',
         data : null
     });
-});
+};
+
+// app.get('/api/v1/tours', getAllTours);
+// app.get('/api/v1/tours/:id', getTour);
+// app.post('/api/v1/tours', postTour);
+// app.patch('/api/v1/tours/:id', patchTour);
+// app.delete('/api/v1/tours/:id', deleteTour);
+
+app.route('/api/v1/tours')
+    .get(getAllTours)
+    .post(postTour);
+app.route('/api/v1/tours/:id')
+    .get(getTour)
+    .patch(patchTour)
+    .delete(deleteTour);
 
 // Listening on specific port
 
