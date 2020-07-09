@@ -13,7 +13,7 @@ tourRouter
 tourRouter
     .route('/')
     .get(tourController.getAllTours)
-    .post(tourController.postTour);
+    .post(tourController.checkBody, tourController.postTour);
 
 tourRouter
     .route('/:id')

@@ -23,6 +23,18 @@ exports.checkID = (req, res, next, val) => {
     next();
 };
 
+// Utility function to check the validity of body data passed
+
+exports.checkBody = (req, res, next) => {
+    if(!req.body.name || !req.body.price) {
+        return res.status(404).json({
+            status : 'failed',
+            message : 'Name or Price data is missing.'
+        });
+    }
+    next();
+};
+
 // GET all available tours
 
 exports.getAllTours = (req, res) => {
