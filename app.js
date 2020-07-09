@@ -118,6 +118,51 @@ const deleteTour = (req, res) => {
     });
 };
 
+// GET all available users
+
+const getAllUsers = (req, res) => {
+    res.status(500).json({
+        status : 'error',
+        message : 'This route is not defined.'
+    });
+};
+
+// POST a new user
+
+const postUser = (req, res) => {
+    res.status(500).json({
+        status : 'error',
+        message : 'This route is not defined.'
+    });
+};
+
+// GET an specific user using userId
+
+const getUser = (req, res) => {
+    res.status(500).json({
+        status : 'error',
+        message : 'This route is not defined.'
+    });
+};
+
+// PATCH an specific user data using userId
+
+const updateUser = (req, res) => {
+    res.status(500).json({
+        status : 'error',
+        message : 'This route is not defined.'
+    });
+};
+
+// DELETE an specific user using userId
+
+const deleteUser = (req, res) => {
+    res.status(500).json({
+        status : 'error',
+        message : 'This route is not defined.'
+    });
+};
+
 // ROUTES
 
 // app.get('/api/v1/tours', getAllTours);
@@ -140,6 +185,12 @@ app
     .route('/api/v1/users')
     .get(getAllUsers)
     .post(postUser)
+
+app
+    .route('/api/v1/users/:id')
+    .get(getUser)
+    .patch(updateUser)
+    .delete(deleteUser)
 
 // SERVER
 
