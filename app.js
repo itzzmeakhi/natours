@@ -2,18 +2,24 @@
 
 const express = require('express');
 const fs = require('fs');
+const morgan = require('morgan');
 
 // Creating / Initializing an express app
 
 const app = express();
 
+// MIDDLEWARE's
+
 // Defining Middleware
 
+app.use(morgan('dev'));
 app.use(express.json());
 app.use((req, res, next) => {
     console.log("Hello from the Middleware 😁");
     next();
 });
+
+// ROUTE CALLBACK FUNCTIONS
 
 // Reading file synchronously at once
 
@@ -112,19 +118,30 @@ const deleteTour = (req, res) => {
     });
 };
 
+// ROUTES
+
 // app.get('/api/v1/tours', getAllTours);
 // app.get('/api/v1/tours/:id', getTour);
 // app.post('/api/v1/tours', postTour);
 // app.patch('/api/v1/tours/:id', patchTour);
 // app.delete('/api/v1/tours/:id', deleteTour);
 
-app.route('/api/v1/tours')
+app
+    .route('/api/v1/tours')
     .get(getAllTours)
     .post(postTour);
-app.route('/api/v1/tours/:id')
+app
+    .route('/api/v1/tours/:id')
     .get(getTour)
     .patch(patchTour)
     .delete(deleteTour);
+
+app
+    .route('/api/v1/users')
+    .get(getAllUsers)
+    .post(postUser)
+
+// SERVER
 
 // Listening on specific port
 
