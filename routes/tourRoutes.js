@@ -7,8 +7,10 @@ const tourController = require('./../controllers/tourController');
 
 const tourRouter = express.Router();
 
-tourRouter
-    .param('id', tourController.checkID);
+// Paramter Middleware
+
+// tourRouter
+//     .param('id', tourController.checkID);
 
 tourRouter
     .route('/')
