@@ -6,11 +6,6 @@ const Tour = require('./../models/tourModel');
 
 // const tours = JSON.parse(fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`, 'utf-8'));
 
-///////////////////////////
-
-// ROUTE CALLBACK FUNCTIONS
-
-//////////////////////////
 
 // Utility function to check the validity of ID
 
@@ -29,15 +24,23 @@ const Tour = require('./../models/tourModel');
 
 // Utility function to check the validity of body data passed
 
-exports.checkBody = (req, res, next) => {
-    if(!req.body.name || !req.body.price) {
-        return res.status(404).json({
-            status : 'failed',
-            message : 'Name or Price data is missing.'
-        });
-    }
-    next();
-};
+// exports.checkBody = (req, res, next) => {
+//     if(!req.body.name || !req.body.price) {
+//         return res.status(404).json({
+//             status : 'failed',
+//             message : 'Name or Price data is missing.'
+//         });
+//     }
+//     next();
+// };
+
+
+///////////////////////////
+
+// ROUTE CALLBACK FUNCTIONS
+
+//////////////////////////
+
 
 // GET all available tours
 
@@ -58,11 +61,28 @@ exports.getTour = (req, res) => {
 
 // POST a new tour data object to the available tours list
 
-exports.postTour = (req, res) => {
+exports.createTour = async (req, res) => {
 
-    res.status(201).json({
-        status : 'success',
-    });
+    // Create Documents in MongoDB
+
+    // const newTour = new Tour({});
+    // newTour.save();
+
+    try {
+        const newTour = await Tour.create(req.body);
+
+        res.status(201).json({
+            status : 'success',
+            data : {
+                tour : newTour
+            }
+        });
+    } catch(error) {
+        res.status(400).json({
+            status : 'failed',
+            message : error
+        });
+    }
 };
 
 // PATCH a specific tour object using tourId

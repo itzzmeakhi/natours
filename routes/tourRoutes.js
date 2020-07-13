@@ -15,7 +15,7 @@ const tourRouter = express.Router();
 tourRouter
     .route('/')
     .get(tourController.getAllTours)
-    .post(tourController.checkBody, tourController.postTour);
+    .post(tourController.createTour);
 
 tourRouter
     .route('/:id')
