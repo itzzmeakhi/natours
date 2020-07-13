@@ -1,6 +1,7 @@
 // Importing the Modules
 
 const Tour = require('./../models/tourModel');
+const app = require('../app');
 
 // // Reading file synchronously at once
 
@@ -45,9 +46,23 @@ const Tour = require('./../models/tourModel');
 // GET all available tours
 
 exports.getAllTours = (req, res) => {
-    res.status(200).json({
-        status : 'success',
-    });
+
+    try {
+        const allTours = Tour.find();
+
+        res.status(200).json({
+            status : 'success',
+            results : allTours.length,
+            data : {
+                tours : allTours
+            }
+        });
+    } catch(error) {
+        res.status(404).json({
+            status : 'failed',
+            message : error
+        });
+    }
 };
 
 // GET a specific tours using tourId
