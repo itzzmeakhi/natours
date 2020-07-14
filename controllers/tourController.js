@@ -2,6 +2,7 @@
 
 const Tour = require('./../models/tourModel');
 const app = require('../app');
+const { all } = require('../app');
 
 // // Reading file synchronously at once
 
@@ -45,10 +46,10 @@ const app = require('../app');
 
 // GET all available tours
 
-exports.getAllTours = (req, res) => {
+exports.getAllTours = async (req, res) => {
 
     try {
-        const allTours = Tour.find();
+        const allTours = await Tour.find();
 
         res.status(200).json({
             status : 'success',
@@ -67,11 +68,26 @@ exports.getAllTours = (req, res) => {
 
 // GET a specific tours using tourId
 
-exports.getTour = (req, res) => {
+exports.getTour = async (req, res) => {
 
-    res.status(200).json({
-        status : 'success',
-    });
+    try {
+        const tour = await Tour.findById(req.params.id);
+
+        // ANOTHER WAY
+        // const tour = Tour.findOne({ _id : req.params.id });
+
+        res.status(200).json({
+            status : 'success',
+            data : {
+                tour : tour
+            }
+        });
+    } catch(error) {
+        res.status(404).json({
+            status : 'failed',
+            message : error
+        });
+    }
 };
 
 // POST a new tour data object to the available tours list
