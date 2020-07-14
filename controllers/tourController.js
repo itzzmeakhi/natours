@@ -142,9 +142,18 @@ exports.updateTour = async (req, res) => {
 
 // DELETE a specific tour object using tourId
 
-exports.deleteTour = (req, res) => {
+exports.deleteTour = async (req, res) => {
 
-    res.status(200).json({
-        status : 'success',
-    });
+    try {
+        await Tour.findByIdAndDelete(req.params.id);
+
+        res.status(204).json({
+            status : 'success',
+        });
+    } catch(error) {
+        res.status(404).json({
+            status : 'failed',
+            message : error
+        });
+    }
 };
