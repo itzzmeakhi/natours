@@ -2,7 +2,7 @@
 
 const Tour = require('./../models/tourModel');
 const app = require('../app');
-const { all } = require('../app');
+const { all, delete } = require('../app');
 
 // // Reading file synchronously at once
 
@@ -49,7 +49,31 @@ const { all } = require('../app');
 exports.getAllTours = async (req, res) => {
 
     try {
-        const allTours = await Tour.find();
+
+        // console.log(req.query);
+        // const allTours = await Tour.find().where('duration').equals(5);
+
+        // BUILD QUERY
+
+        // FILTERING QUERY
+
+        const queryObj = { ...req.query };
+        const excludedFields = ['page', 'sort', 'limit', 'fields'];
+        excludedFields.forEach(el => delete queryObj[el]);
+
+        // ADVANCED FILTERING
+
+        let queryStr = JSON.stringify(queryObj);
+        queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
+        console.log(JSON.parse(queryStr));
+
+        const query = Tour.find(queryObj);
+
+        // EXECUTE QUERY
+
+        const allTours = await query;
+
+        // SEND RESPONSE
 
         res.status(200).json({
             status : 'success',
