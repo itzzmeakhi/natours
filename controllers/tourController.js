@@ -116,20 +116,35 @@ exports.createTour = async (req, res) => {
     }
 };
 
-// PATCH a specific tour object using tourId
+// UPDATE a specific tour object using tourId
 
-exports.patchTour = (req, res) => {
+exports.updateTour = async (req, res) => {
 
-    res.status(200).json({
-        status : 'success',
-    });
+    try {
+        const updatedTour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
+            new : true,
+            runValidators : true
+        });
+
+        res.status(200).json({
+            status : 'success',
+            data : {
+                tour : updatedTour
+            }
+        });
+    } catch(error) {
+        res.status(400).json({
+            status : 'failed',
+            message : error
+        });
+    }
 };
 
 // DELETE a specific tour object using tourId
 
 exports.deleteTour = (req, res) => {
 
-    res.status(204).json({
+    res.status(200).json({
         status : 'success',
     });
 };

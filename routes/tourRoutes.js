@@ -20,7 +20,7 @@ tourRouter
 tourRouter
     .route('/:id')
     .get(tourController.getTour)
-    .patch(tourController.patchTour)
+    .patch(tourController.updateTour)
     .delete(tourController.deleteTour);
 
 // Exporting the Modules
