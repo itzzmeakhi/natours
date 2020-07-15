@@ -42,6 +42,13 @@ const app = require('../app');
 
 //////////////////////////
 
+exports.aliasTopTours = (req, res, next) => {
+    req.query.limit = '5';
+    req.query.sort = '-ratingsAverage, price';
+    req.query.fields = 'name, price, ratingsAverage, summary, difficulty';
+    next();
+};
+
 
 // GET all available tours
 
@@ -79,7 +86,6 @@ exports.getAllTours = async (req, res) => {
             query = query.sort('createdAt');
         }
 
-        // EXECUTE QUERY
         // http://localhost:8000/api/v1/tours?price=121&rating[gte]=4.7&sort=price
 
         // FIELD LIMITING
@@ -90,6 +96,21 @@ exports.getAllTours = async (req, res) => {
         } else {
             query = query.select('__v');
         }
+
+        // PAGINATION
+
+        const page = req.query.page * 1 || 1;
+        const limit = req.query.limit * 1 || 100;
+        const skip = (page - 1) * limit;
+
+        query = query.skip(skip).limit(limit);
+
+        if(req.query.page) {
+            const numTours = await Tour.countDocuments();
+            if (skip >= numTours) throw new Error('This page does not exist');
+        }
+
+        // EXECUTE QUERY
 
         const allTours = await query;
 
