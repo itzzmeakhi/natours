@@ -82,6 +82,15 @@ exports.getAllTours = async (req, res) => {
         // EXECUTE QUERY
         // http://localhost:8000/api/v1/tours?price=121&rating[gte]=4.7&sort=price
 
+        // FIELD LIMITING
+
+        if(req.query.fields) {
+            const fields = req.query.fields.split(',').join(' ');
+            query = query.select(fields);
+        } else {
+            query = query.select('__v');
+        }
+
         const allTours = await query;
 
         // SEND RESPONSE
