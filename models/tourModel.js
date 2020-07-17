@@ -79,16 +79,25 @@ tourSchema.virtual('durationWeeks').get(function() {
 
 // Query Middleware. Runs for all types of queries
 
-tourSchema.pre(/^find/, function(next) {
-    this.find({ secretTour : { $ne : true } });
+// tourSchema.pre(/^find/, function(next) {
+//     this.find({ secretTour : { $ne : true } });
 
-    this.start = Date.now();
-    next();
-});
+//     this.start = Date.now();
+//     next();
+// });
 
-tourSchema.post(/^find/, function(docs, next) {
-    console.log(`Query took ${Date.now() - this.start} milliseconds`);
-    console.log(docs);
+// tourSchema.post(/^find/, function(docs, next) {
+//     console.log(`Query took ${Date.now() - this.start} milliseconds`);
+//     console.log(docs);
+//     next();
+// });
+
+// Aggregation Middleware. Runs for all aggregation middleware's defined
+
+tourSchema.pre('aggregate', function(next) {
+    this.pipeline().unshift({ $match : { secretTour : { $ne : true } } });
+
+    console.log(this.pipeline());
     next();
 });
 
