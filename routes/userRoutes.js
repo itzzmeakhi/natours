@@ -11,6 +11,9 @@ const userRouter = express.Router();
 userRouter.post('/signup', authController.signupNewUser);
 userRouter.post('/login', authController.login);
 
+userRouter.post('/forgotPassword', authController.forgotPassword);
+userRouter.post('/resetPassword', authController.resetPassword);
+
 userRouter
     .route('/')
     .get(userController.getAllUsers)
