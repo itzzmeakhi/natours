@@ -1,6 +1,7 @@
 // Importing the required modules
 
 const User = require('./../models/userModel');
+const crypto = require('crypto');
 const { promisify } = require('util');
 const catchAsync = require('./../utils/catchAsync');
 const jwt = require('jsonwebtoken');
@@ -12,6 +13,8 @@ const signInToken = id => {
         expiresIn : process.env.JWT_EXPIRES_IN
     });
 };
+
+// Controller function to handle signing up of new user
 
 exports.signupNewUser = catchAsync(async (req, res, next) => {
     const newUser = await User.create({
@@ -30,6 +33,8 @@ exports.signupNewUser = catchAsync(async (req, res, next) => {
         }
     });
 });
+
+// Controller function to handle login of a user
 
 exports.login = catchAsync(async (req, res, next) => {
 
@@ -60,6 +65,7 @@ exports.login = catchAsync(async (req, res, next) => {
     });
 });
 
+// Controller function to protect the routes based on the authentication status
 
 exports.protect = catchAsync(async (req, res, next) => {
 
@@ -96,6 +102,8 @@ exports.protect = catchAsync(async (req, res, next) => {
     next();
 });
 
+// Controller function to handle accesss to specific routes based on user roles
+
 exports.restrictTo = (...roles) => {
     return (req, res, next) => {
         if(!roles.includes(req.user.role)) {
@@ -107,6 +115,8 @@ exports.restrictTo = (...roles) => {
         next();
     };
 };
+
+// Controller function to handle forgot password
 
 exports.forgotPassword = async (req, res, next) => {
     // 1) Get user based on POSTed email
@@ -143,11 +153,42 @@ exports.forgotPassword = async (req, res, next) => {
         });
     } catch(err) {
         user.passwordResetToken = undefined;
-        user.passwordResetTokenExpires = undefined;
+        user.passwordResetExpires = undefined;
         await user.save({ validateBeforeSave : false });
 
         return next(new AppError('There was an error sending an mail. Try again later', 500));
     }
 };
 
-exports.resetPassword = (req, res, next) => {};
+// Controller function to reset password
+
+exports.resetPassword = (req, res, next) => {
+    // 1) GET the user based on the token
+
+    const hashedToken = crypto.createHash('sha256').update(req.params.token).digest('hex');
+
+    const user = await User.findOne({ passwordResetToken : hashedToken, passwordResetExpires : { $gt : Date.now() } });
+
+    // 2) If the token has not expired, and there is user, set the password
+
+    if(!user) {
+        return next(new AppError('Token is invalid or has expired', 400));
+    }
+
+    user.password = req.body.password;
+    user.passwordConfirm = req.body.passwordConfirm;
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    await user.save();
+
+    // 3) Update changedPasswordAt property for the user
+
+    // 4) Log the user in, send the JWT
+
+    const token = signInToken(user._id);
+
+    res.status(200).json({
+        status : 'success',
+        token
+    });
+};
