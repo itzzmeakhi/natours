@@ -14,6 +14,20 @@ const signInToken = id => {
     });
 };
 
+// Send Token Response
+
+const createSendToken = (user, statusCode, res) => {
+    const token = signInToken(user._id);
+
+    res.status(statusCode).json({
+        status : 'success',
+        token,
+        data : {
+            user: user
+        }
+    });
+};
+
 // Controller function to handle signing up of new user
 
 exports.signupNewUser = catchAsync(async (req, res, next) => {
@@ -24,14 +38,16 @@ exports.signupNewUser = catchAsync(async (req, res, next) => {
         passwordConfirm : req.body.passwordConfirm
     });
 
-    const token = signInToken(newUser._id);
+    createSendToken(newUser, 201, res);
 
-    res.status(201).json({
-        status : 'success',
-        data : {
-            user : newUser
-        }
-    });
+    // const token = signInToken(newUser._id);
+
+    // res.status(201).json({
+    //     status : 'success',
+    //     data : {
+    //         user : newUser
+    //     }
+    // });
 });
 
 // Controller function to handle login of a user
@@ -58,11 +74,13 @@ exports.login = catchAsync(async (req, res, next) => {
 
     // 3) IF EVERYTHING IS OK, SEND RESPONSE TO THE CLIENT
 
-    const token = signInToken(user._id);
-    res.status(200).json({
-        status : 'success',
-        token : token
-    });
+    createSendToken(user, 200, res);
+
+    // const token = signInToken(user._id);
+    // res.status(200).json({
+    //     status : 'success',
+    //     token : token
+    // });
 });
 
 // Controller function to protect the routes based on the authentication status
@@ -185,10 +203,37 @@ exports.resetPassword = (req, res, next) => {
 
     // 4) Log the user in, send the JWT
 
-    const token = signInToken(user._id);
+    createSendToken(user, 200, res);
 
-    res.status(200).json({
-        status : 'success',
-        token
-    });
+    // const token = signInToken(user._id);
+
+    // res.status(200).json({
+    //     status : 'success',
+    //     token
+    // });
 };
+
+// Controller function to update the password
+
+exports.updatePassword = catchAsync(async (req, res, next) => {
+
+    // 1) GET user from the collection
+
+    const user = await User.findById(req.user.id).select('+password');
+
+    // 2) Check if POSTed current password is correct
+
+    if(!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
+        return next(new AppError('Your current password is wrong!', 401));
+    }
+
+    // 3) If so, update the password
+
+    user.password = req.body.password;
+    user.passwordConfirm = req.body.passwordConfirm;
+    await user.save();
+
+    // 4) Log user in, send JWT
+
+    createSendToken(user, 200, res);
+});
