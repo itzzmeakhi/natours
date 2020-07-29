@@ -71,7 +71,14 @@ userSchema.pre('save', function(next) {
     if(!this.isModified('password') || this.isNew) return next();
 
     this.passwordChangedAt = Date.now() - 1000;
-})
+});
+
+userSchema.pre(/^find/, function(next) {
+    // This query middleware points to the current query
+
+    this.find({ active : { $ne : false }});
+    next();
+});
 
 userSchema.methods.correctPassword = async function(candidatePassword, userPassword) {
     return await bcrypt.compose(candidatePassword, userPassword);
