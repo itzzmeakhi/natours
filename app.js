@@ -1,6 +1,7 @@
 // Importing the required libraries
 
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 const morgan = require('morgan');
 const tourRoutes = require('./routes/tourRoutes');
 const userRoutes = require('./routes/userRoutes');
@@ -11,13 +12,22 @@ const globalErrorHandler = require('./controllers/errorController');
 
 const app = express();
 
-// MIDDLEWARE's
+// GLOBAL MIDDLEWARE's
 
 // Defining Middleware
 
 if(process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'));
 }
+
+const limiter = rateLimit({
+    max : 100,
+    windowMs : 60 * 60 * 1000,
+    message : 'Too many requests from this IP, please try again in an hour'
+});
+
+app.use('/api', limiter);
+
 app.use(express.json());
 app.use(express.static(`${__dirname}/public`));
 
