@@ -2,6 +2,7 @@
 
 const express = require('express');
 const rateLimit = require('express-rate-limit');
+const hpp = require('hpp');
 const helmet = require('helmet');
 const morgan = require('morgan');
 const tourRoutes = require('./routes/tourRoutes');
@@ -47,6 +48,19 @@ app.use(mongoSanitize());
 // Data sanitization against XSS
 
 app.use(xss());
+
+// Prevent parameter pollution
+
+app.use(hpp({
+    whitelist : [
+        'duration',
+        'ratingsQuantity',
+        'ratingsAverage',
+        'maxGroupSize',
+        'difficulty',
+        'price'
+    ]
+}));
 
 // Serving the static files
 
