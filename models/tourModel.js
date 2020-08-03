@@ -1,6 +1,8 @@
 // Importing Modules
 
 const mongoose = require('mongoose');
+const User = require('./userModel');
+const Review = require('./reviewModel');
 
 // Tour Schema
 
@@ -72,7 +74,37 @@ const tourSchema = new mongoose.Schema({
         default : Date.now(),
         select : false
     },
-    startDates : [Date]
+    startDates : [Date],
+    startLocation : {
+        // GeoJSON
+        type : {
+            type : String,
+            default : 'Point',
+            enum : ['Point']
+        },
+        coordinates : [Number],
+        address : String,
+        description : String
+    },
+    locations : [
+        {
+            type : {
+                type : String,
+                default : 'Point',
+                enum : ['Point']
+            },
+            coordinates : [Number],
+            address : String,
+            description : String,
+            day : Number
+        }
+    ],
+    guides : [
+        {
+            type : mongoose.Schema.ObjectId,
+            ref : 'User'
+        }
+    ]
 }, {
     toJSON : { virtuals : true },
     toObject : { virtuals : true }
@@ -80,6 +112,14 @@ const tourSchema = new mongoose.Schema({
 
 tourSchema.virtual('durationWeeks').get(function() {
     return this.duration / 7;
+});
+
+// Virtual populate
+
+tourSchema.virtual('reviews', {
+    ref : Review,
+    foreignField : 'tour',
+    localField : '_id'
 });
 
 // DOCUMENT middleware. Runs only on Create and 
@@ -117,6 +157,14 @@ tourSchema.pre('aggregate', function(next) {
     console.log(this.pipeline());
     next();
 });
+
+// Embedding tour guides data into tour data
+
+// tourSchema.pre('save', async function(next) {
+//     const guidePromises = this.guides.map(async id => await User.findById(id));
+//     this.guides = await Promise.all(guidePromises);
+//     next();
+// });
 
 const Tour = mongoose.model('Tour', tourSchema);
 

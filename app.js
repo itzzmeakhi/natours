@@ -7,10 +7,12 @@ const helmet = require('helmet');
 const morgan = require('morgan');
 const tourRoutes = require('./routes/tourRoutes');
 const userRoutes = require('./routes/userRoutes');
+const reviewRoutes = require('./routes/reviewRoutes');
 const AppError = require('./utils/appError');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const globalErrorHandler = require('./controllers/errorController');
+const reviewRouter = require('./routes/reviewRoutes');
 
 // Creating / Initializing an express app
 
@@ -84,6 +86,7 @@ app.use((req, res, next) => {
 
 app.use('/api/v1/tours', tourRoutes);
 app.use('/api/v1/users', userRoutes);
+app.use('/api/v1/reviews', reviewRoutes);
 
 app.use('*', (req, res, next) => {
     // res.status(404).json({
@@ -104,3 +107,4 @@ app.use(globalErrorHandler);
 // Exporting the Modules
 
 module.exports = app;
+
