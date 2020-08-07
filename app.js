@@ -2,6 +2,7 @@
 
 const express = require('express');
 const rateLimit = require('express-rate-limit');
+const path = require('path');
 const hpp = require('hpp');
 const helmet = require('helmet');
 const morgan = require('morgan');
@@ -17,6 +18,9 @@ const reviewRouter = require('./routes/reviewRoutes');
 // Creating / Initializing an express app
 
 const app = express();
+
+app.set('view image', 'pug');
+app.set('views', path.join(__dirname, 'views'));
 
 // GLOBAL MIDDLEWARE's
 
@@ -83,6 +87,10 @@ app.use((req, res, next) => {
 // app.post('/api/v1/tours', postTour);
 // app.patch('/api/v1/tours/:id', patchTour);
 // app.delete('/api/v1/tours/:id', deleteTour);
+
+app.get('/', (req, res) => {
+    res.status(200).render('emailTemplate')
+});
 
 app.use('/api/v1/tours', tourRoutes);
 app.use('/api/v1/users', userRoutes);
